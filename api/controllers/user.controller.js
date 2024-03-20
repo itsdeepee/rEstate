@@ -31,7 +31,7 @@ export const updateUser=async(req,res,next)=>{
                 username:req.body.username,
                 email:req.body.email,
                 password:req.body.password,
-                avatar:req.body.avatar,
+                photo:req.body.photo,
             }
         },{new:true})
 
@@ -48,5 +48,19 @@ export const updateUser=async(req,res,next)=>{
     }catch(error){
          // Pass any caught errors to the next middleware
         next(error)
+    }
+}
+
+export const deleteUser=async(req,res,next)=>{
+    if(req.user.id!==req.params.id) {
+        return next(errorHandler(401,"You can only delete your own account!"))
+    }
+
+    try{
+        await User.findByIdAndDelete(req.params.id)
+        res.clearCookie('access_token');
+        res.status(200).json({message:'User deleted'});
+    }catch(error){
+        next(error);
     }
 }
